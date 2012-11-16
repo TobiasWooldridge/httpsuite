@@ -6,6 +6,7 @@ import java.io.*;
 import httpfoundation.Request;
 import httpfoundation.Response;
 import httpfoundation.InternalServiceError;
+import httpfoundation.HTTPDialogueError;
 
 /**
  * HTTPClient connects to remote servers, sends requests, and parses responses.
@@ -69,9 +70,12 @@ public class HTTPClient {
             connection.close();
             
             return response;
+        } catch (HTTPDialogueError e) {
+            System.err.println("Bad HTTP Dialogue: " + e);
+            throw new InternalServiceError("Bad HTTP dialogue");
         } catch (IOException e) {
-            System.out.println("Error retrieving data: " + e);
-            return new Response(502);
+            System.err.println("Error retrieving data: " + e);
+            throw new InternalServiceError("Error retrieving data");
         }
     }
 }

@@ -37,8 +37,6 @@ public class Response extends HTTPMessage {
     }
 
     public String toString() {
-        setHeader("Content-Length", Integer.toString(content.length()));
-
         StringBuilder completeResponse = new StringBuilder();
 
         // Reconstitute response string

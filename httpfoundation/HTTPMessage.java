@@ -22,13 +22,13 @@ public abstract class HTTPMessage {
      * Convert a HTTP header line to a header attached to this message.
      *
      * @param rawHeader
-     * @throws InternalServiceError
+     * @throws HTTPDialogueError
      */
-    public void parseRawHeader(String rawHeader) throws InternalServiceError {
+    public void parseRawHeader(String rawHeader) throws HTTPDialogueError {
         String expandedHeader[] = rawHeader.split(": ?", 2);
 
         if (expandedHeader.length != 2) {
-            throw new InternalServiceError("Invalid header " + rawHeader);
+            throw new HTTPDialogueError("Invalid header " + rawHeader);
         }
 
         setHeader(expandedHeader[0], expandedHeader[1]);

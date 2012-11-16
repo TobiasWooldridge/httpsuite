@@ -17,9 +17,9 @@ public class Request extends HTTPMessage {
      * request line
      * 
      * @param requestLine
-     * @throws InternalServiceError
+     * @throws HTTPDialogueError
      */
-    public Request(String requestLine) throws InternalServiceError {
+    public Request(String requestLine) throws HTTPDialogueError {
         parseRawRequestLine(requestLine);
     }
 
@@ -28,17 +28,17 @@ public class Request extends HTTPMessage {
      * parts and add them to this object.
      * 
      * @param requestLine
-     * @throws InternalServiceError
+     * @throws HTTPDialogueError
      */
-    public void parseRawRequestLine(String requestLine) throws InternalServiceError {
+    public void parseRawRequestLine(String requestLine) throws HTTPDialogueError {
         if (requestLine == null) {
-            throw new InternalServiceError("Null request line");
+            throw new HTTPDialogueError("Null request line");
         }
 
         String[] requestParameters = requestLine.split(" ");
 
         if (requestParameters.length < 2 || requestParameters.length > 3) {
-            throw new InternalServiceError("Invalid number of parameters in request line");
+            throw new HTTPDialogueError("Invalid number of parameters in request line");
         }
 
         method = requestParameters[0];
@@ -50,13 +50,13 @@ public class Request extends HTTPMessage {
             String[] expandedProtocol = requestParameters[2].split("/");
 
             if (expandedProtocol.length != 2 || !expandedProtocol[0].equals("HTTP")) {
-                throw new InternalServiceError("Invalid protocol specified in request line");
+                throw new HTTPDialogueError("Invalid protocol specified in request line");
             }
 
             try {
                 protocol = Double.parseDouble(expandedProtocol[1]);
             } catch (Exception e) {
-                throw new InternalServiceError("Non-numeric or missing HTTP version specified");
+                throw new HTTPDialogueError("Non-numeric or missing HTTP version specified");
             }
         }
     }

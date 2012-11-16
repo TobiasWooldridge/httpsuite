@@ -1,6 +1,7 @@
 package httpserver;
 
 import httpfoundation.InternalServiceError;
+import httpfoundation.HTTPDialogueError;
 import httpfoundation.Request;
 import httpfoundation.Response;
 import java.io.*;
@@ -37,10 +38,11 @@ class ConnectionThread extends Thread {
             Response response = new Response(500);
 
             try {
+                // Read request line
                 Request request = new Request(inbound.readLine());
                 String input;
 
-                // Read request line
+                // Read headers
                 do {
                     input = inbound.readLine();
 
@@ -51,10 +53,15 @@ class ConnectionThread extends Thread {
                     }
                 } while (input.length() > 0);
 
-                // TODO (one day..): accept data
+                // TODO (one day..): accept data .. maybe
 
                 response = requestHandler.generateResponse(request);
-            } catch (InternalServiceError e) {
+
+                response.setHeader("Content-Length", Integer.toString(response.getContent().length()));
+            } catch (HTTPDialogueError e) {
+                System.out.println(e);
+                response = new Response(400);
+            }  catch (InternalServiceError e) {
                 System.out.println(e);
                 response = new Response(500);
             } finally {
