@@ -5,7 +5,11 @@ import httpserver.HTTPServer;
 
 class net1 {
     // ServerTimeout defines after how long idle connections are closed
-    public static final int ServerTimeout = 60000;
+    public static final int SERVER_TIMEOUT = 60000;
+
+    public static int getThreadCount() {
+        return 2 * Runtime.getRuntime().availableProcessors();
+    }
 
     public static int getPort() {
         // return 15945;
@@ -33,13 +37,13 @@ class net1 {
 
     public static void main(String[] args) {
         int port = getPort();
-
-        System.out.println("Starting HTTP server on port " + port);
-
         RequestHandler requestHandler = new RequestHandler();
+        int threadCount = getThreadCount();
 
-        HTTPServer server = new HTTPServer(port, requestHandler);
-        server.setTimeout(ServerTimeout);
+        System.out.println("Starting HTTP server on port " + port + " with " + threadCount + " threads.");
+
+        HTTPServer server = new HTTPServer(port, requestHandler, threadCount);
+        server.setTimeout(SERVER_TIMEOUT);
         server.listen();
     }
 }

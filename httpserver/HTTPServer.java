@@ -2,6 +2,7 @@ package httpserver;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.*;
 
 /**
  * HTTPServer listens for connections to the server opening and dispatches them
@@ -13,8 +14,9 @@ public class HTTPServer {
     private ServerSocket listeningSocket;
     private BaseRequestHandler requestHandler;
     private static int timeout = 60000;
+    private static ExecutorService threadPool;
 
-    public HTTPServer(int port, BaseRequestHandler requestHandler) {
+    public HTTPServer(int port, BaseRequestHandler requestHandler, int threads) {
         this.port = port;
         this.requestHandler = requestHandler;
 
@@ -24,6 +26,8 @@ public class HTTPServer {
             System.err.println("Unable to listen on port " + port);
             System.exit(1);
         }
+
+        threadPool = Executors.newFixedThreadPool(threads);
     }
 
     public void setTimeout(int newTimeout) {
@@ -38,7 +42,9 @@ public class HTTPServer {
                 connection.setSoTimeout(timeout);
                 
                 // Connections are handled within ConnectionThread
-                ConnectionThread.dispatch(connection, requestHandler);
+                ConnectionThread connectionThread = new ConnectionThread(connection, requestHandler);
+
+                threadPool.submit(connectionThread);
             }
         } catch (IOException e) {
             System.err.println("Unable to accept connections on port " + port);
