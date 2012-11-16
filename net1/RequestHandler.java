@@ -7,6 +7,12 @@ import httpfoundation.Response;
 import httpserver.BaseRequestHandler;
 
 class RequestHandler extends BaseRequestHandler {
+    private FileReader fileReader;
+
+    public RequestHandler() {
+        fileReader = new CachedFileReader();
+    }
+
 
     /**
      * Accept a Request from a client and somehow generate a Response to be
@@ -24,10 +30,10 @@ class RequestHandler extends BaseRequestHandler {
             String pageContent;
 
             try {
-                FileReader reader = new FileReader("./README.md");
-                pageContent = reader.read();
+                pageContent = fileReader.read("./README.md");
             }
             catch (Exception e) {
+                System.err.println("File could not be read: " + e);
                 throw new InternalServiceError("File could not be read");
             }
 
