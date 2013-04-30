@@ -12,19 +12,18 @@ public class HTTPServer {
 
     private int port;
     private ServerSocket listeningSocket;
-    private BaseRequestHandler requestHandler;
+    private RequestHandler requestHandler;
     private static int timeout = 60000;
     private static ExecutorService threadPool;
 
-    public HTTPServer(int port, BaseRequestHandler requestHandler, int threads) {
+    public HTTPServer(int port, RequestHandler requestHandler, int threads) throws IOException {
         this.port = port;
         this.requestHandler = requestHandler;
 
         try {
             listeningSocket = new ServerSocket(port);
         } catch (IOException e) {
-            System.err.println("Unable to listen on port " + port);
-            System.exit(1);
+            throw new IOException("Unable to start server, port unavailable", e);
         }
 
         threadPool = Executors.newFixedThreadPool(threads);
@@ -41,8 +40,9 @@ public class HTTPServer {
                 Socket connection = listeningSocket.accept();
                 connection.setSoTimeout(timeout);
                 
-                // Connections are handled within ConnectionThread
-                ConnectionThread connectionThread = new ConnectionThread(connection, requestHandler);
+                System.out.println("New connection " + connection);
+                
+                ConnectionResponder connectionThread = new ConnectionResponder(connection, requestHandler);
 
                 threadPool.submit(connectionThread);
             }
